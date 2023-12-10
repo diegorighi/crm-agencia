@@ -26,6 +26,9 @@ public class ClienteController {
 
     @PostMapping("/cadastrar")
     public void cadastrarCliente(@RequestBody @Valid final ClienteRecordForm form) {
+        if(service.existeCliente(form.cpf()))
+            throw new RuntimeException("Cliente já cadastrado");
+        else
         service.cadastro(form);
     }   
 

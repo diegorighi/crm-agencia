@@ -6,4 +6,6 @@ import br.com.agencia.crm.agenciacrm.models.entities.ClienteEntity;
 
 public interface ClienteRepository extends MongoRepository<ClienteEntity, String>{
 
+    Boolean existsByDocumentosCpf(String cpf);
+
 }
