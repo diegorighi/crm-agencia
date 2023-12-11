@@ -6,14 +6,17 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteRecordDTO;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
 @EqualsAndHashCode
-@Document(collection = "clientes")
+@AllArgsConstructor
+@Document("clientes")
 public class ClienteEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -24,13 +27,16 @@ public class ClienteEntity implements Serializable {
     private DadosPessoaisEntity dadosPessoais;
     private DocumentosEntity documentos;
     private ContatoEntity contato;
-    private EnderecoEntity dadosEndereco;
+    private EnderecoEntity endereco;
+
+    @Deprecated
+    public ClienteEntity(){}
 
     public ClienteEntity(ClienteRecordDTO cliente) {
         this.dadosPessoais = new DadosPessoaisEntity(cliente.dadosPessoais());
         this.documentos = new DocumentosEntity(cliente.documentos());
         this.contato = new ContatoEntity(cliente.contato());
-        this.dadosEndereco = new EnderecoEntity(cliente.endereco());
+        this.endereco = new EnderecoEntity(cliente.endereco());
     }   
 
 }

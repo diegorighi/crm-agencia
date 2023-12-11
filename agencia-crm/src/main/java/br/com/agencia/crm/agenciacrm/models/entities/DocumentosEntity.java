@@ -3,11 +3,15 @@ package br.com.agencia.crm.agenciacrm.models.entities;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.agencia.crm.agenciacrm.models.records.dto.DocumentosRecordDTO;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
 @Document(collection = "documentos")
 public class DocumentosEntity {
 

@@ -10,6 +10,15 @@ public enum SexoEnum {
         this.sexo = sexo;
     }
 
+    public static SexoEnum fromString(String sexoStr) {
+        for (SexoEnum sexo : SexoEnum.values()) {
+            if (sexo.name().equalsIgnoreCase(sexoStr)) {
+                return sexo;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant " + sexoStr);
+    }
+
     public String getSexo() {
         return sexo;
     }

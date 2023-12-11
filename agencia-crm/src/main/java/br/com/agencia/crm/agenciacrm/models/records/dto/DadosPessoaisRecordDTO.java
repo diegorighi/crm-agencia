@@ -1,5 +1,6 @@
 package br.com.agencia.crm.agenciacrm.models.records.dto;
 
+import br.com.agencia.crm.agenciacrm.models.entities.DadosPessoaisEntity;
 import br.com.agencia.crm.agenciacrm.models.enums.EstadoCivilEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.SexoEnum;
 

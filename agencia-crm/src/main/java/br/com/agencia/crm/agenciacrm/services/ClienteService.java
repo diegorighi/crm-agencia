@@ -1,5 +1,8 @@
 package br.com.agencia.crm.agenciacrm.services;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,4 +30,16 @@ public class ClienteService {
     public Boolean existeCliente(String cpf) {
         return repository.existsByDocumentosCpf(cpf);
     }
+
+    public List<ClienteRecordDTO> listarClientes() {
+        List<ClienteEntity> mongoEntities = repository.findAll();
+
+        List<ClienteRecordDTO> clienteRecordDTOs = mongoEntities.stream()
+                .map(ClienteUtils::entityToDto) // Fix: Define the missing method entityToDto in the ClienteUtils class
+                .collect(Collectors.toList());
+
+        return clienteRecordDTOs;
+    }
+    
+    
 }

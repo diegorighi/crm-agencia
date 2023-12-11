@@ -1,5 +1,6 @@
 package br.com.agencia.crm.agenciacrm.models.records.dto;
 
+import br.com.agencia.crm.agenciacrm.models.entities.EnderecoEntity;
 import br.com.agencia.crm.agenciacrm.models.enums.UfEnum;
 
 public record EnderecoRecordDTO(
@@ -11,5 +12,6 @@ public record EnderecoRecordDTO(
     String cep,
     String pais
 ) {
-    
+
+
 }

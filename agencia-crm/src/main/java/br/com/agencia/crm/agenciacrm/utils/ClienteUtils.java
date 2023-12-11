@@ -1,6 +1,11 @@
 package br.com.agencia.crm.agenciacrm.utils;
 
+import java.util.List;
+
 import br.com.agencia.crm.agenciacrm.models.entities.ClienteEntity;
+import br.com.agencia.crm.agenciacrm.models.enums.EstadoCivilEnum;
+import br.com.agencia.crm.agenciacrm.models.enums.SexoEnum;
+import br.com.agencia.crm.agenciacrm.models.enums.UfEnum;
 import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.ContatoRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DadosPessoaisRecordDTO;
@@ -44,5 +49,37 @@ public class ClienteUtils {
 
     public static ClienteEntity dtoToEntity(ClienteRecordDTO dto) {
         return new ClienteEntity(dto);
+    }
+
+    public static ClienteRecordDTO entityToDto(ClienteEntity entity) {
+        return new ClienteRecordDTO(
+                    new DadosPessoaisRecordDTO(
+                        entity.getDadosPessoais().getPrimeiroNome(),
+                        entity.getDadosPessoais().getNomeDoMeio(),
+                        entity.getDadosPessoais().getSobrenome(),
+                        entity.getDadosPessoais().getDataNascimento(),
+                        SexoEnum.fromString(entity.getDadosPessoais().getSexo()),
+                        EstadoCivilEnum.fromString(entity.getDadosPessoais().getEstadoCivil()),
+                        entity.getDadosPessoais().getProfissao()
+                    ),
+                    new DocumentosRecordDTO(
+                        entity.getDocumentos().getCpf(),
+                        entity.getDocumentos().getPassaporte(),
+                        entity.getDocumentos().getDataVencimentoPassaporte()
+                    ),
+                    new ContatoRecordDTO(
+                        entity.getContato().getEmail(),
+                        entity.getContato().getCelular()
+                    ),
+                    new EnderecoRecordDTO(
+                        entity.getEndereco().getLogradouro(),
+                        entity.getEndereco().getNumero(),
+                        entity.getEndereco().getComplemento(),
+                        entity.getEndereco().getCidade(),
+                        UfEnum.fromString(entity.getEndereco().getUf()),
+                        entity.getEndereco().getCep(),
+                        entity.getEndereco().getPais()
+                    )
+                );
     }
 }

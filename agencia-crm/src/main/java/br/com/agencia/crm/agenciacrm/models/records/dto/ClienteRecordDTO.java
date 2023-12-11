@@ -5,4 +5,6 @@ public record ClienteRecordDTO(
     DocumentosRecordDTO documentos,
     ContatoRecordDTO contato,
     EnderecoRecordDTO endereco
-) {}
+) {
+
+}
