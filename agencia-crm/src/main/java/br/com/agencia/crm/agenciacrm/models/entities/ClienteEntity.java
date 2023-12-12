@@ -1,6 +1,8 @@
 package br.com.agencia.crm.agenciacrm.models.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,7 +11,6 @@ import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteRecordDTO;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
@@ -28,6 +29,7 @@ public class ClienteEntity implements Serializable {
     private DocumentosEntity documentos;
     private ContatoEntity contato;
     private EnderecoEntity endereco;
+    private List<ClienteEntity> dependentes = new ArrayList<ClienteEntity>();
 
     @Deprecated
     public ClienteEntity(){}
@@ -38,5 +40,9 @@ public class ClienteEntity implements Serializable {
         this.contato = new ContatoEntity(cliente.contato());
         this.endereco = new EnderecoEntity(cliente.endereco());
     }   
+
+    public void addDependente(ClienteEntity dependente){
+        this.dependentes.add(dependente);
+    }
 
 }

@@ -1,6 +1,7 @@
 package br.com.agencia.crm.agenciacrm.utils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import br.com.agencia.crm.agenciacrm.models.entities.ClienteEntity;
 import br.com.agencia.crm.agenciacrm.models.enums.EstadoCivilEnum;
@@ -43,8 +44,15 @@ public class ClienteUtils {
                 form.uf(),
                 form.cep(),
                 form.pais()
-            )
+            ),
+            null
         );
+    }
+
+    private static List<ClienteRecordDTO> dependentesFormToDto(List<ClienteRecordForm> dependentes) {
+        return dependentes.stream()
+                .map(ClienteUtils::formTDto)
+                .collect(Collectors.toList());
     }
 
     public static ClienteEntity dtoToEntity(ClienteRecordDTO dto) {
@@ -79,7 +87,19 @@ public class ClienteUtils {
                         UfEnum.fromString(entity.getEndereco().getUf()),
                         entity.getEndereco().getCep(),
                         entity.getEndereco().getPais()
-                    )
+                    ),
+                    dependentesEntityToDto(entity.getDependentes())
                 );
     }
+
+    private static List<ClienteRecordDTO> dependentesEntityToDto(List<ClienteEntity> dependentes) {
+        return dependentes.stream()
+                .map(ClienteUtils::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    public static ClienteEntity formToEntity(ClienteRecordForm form) {
+        return new ClienteEntity(formTDto(form));
+    }
+
 }

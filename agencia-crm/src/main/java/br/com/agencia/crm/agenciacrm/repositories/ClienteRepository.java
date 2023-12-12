@@ -10,4 +10,10 @@ public interface ClienteRepository extends MongoRepository<ClienteEntity, String
 
     Boolean existsByDocumentosCpf(String cpf);
 
+    ClienteEntity findByDocumentosCpf(String cpf);
+
+    void deleteByDocumentosCpf(String cpf);
+
+    boolean existsByDependentesDocumentosCpf(String cpf);
+
 }
