@@ -1,5 +1,6 @@
 package br.com.agencia.crm.agenciacrm.utils;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,5 +96,20 @@ public class ClienteUtils {
     public static ClienteEntity formToEntity(ClienteRecordForm form) {
         return new ClienteEntity(formTDto(form));
     }
+
+    public static void addDependente(ClienteEntity dependente, List<ClienteEntity> dependentes) {
+		dependentes.add(dependente);
+	}
+
+	public static void removeDependente(String cpfDependente, List<ClienteEntity> dependentes) {
+	    Iterator<ClienteEntity> iterator = dependentes.iterator();
+	    while (iterator.hasNext()) {
+	        ClienteEntity dependente = iterator.next();
+	        if (cpfDependente.equals(dependente.getDocumentos().getCpf())) {
+	            iterator.remove();
+	            return;
+	        }
+	    }
+	}
 
 }

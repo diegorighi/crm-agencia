@@ -2,6 +2,7 @@ package br.com.agencia.crm.agenciacrm.models.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -20,29 +21,28 @@ import lombok.ToString;
 @Document("clientes")
 public class ClienteEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
+	@Id
 	private String id;
 
-    private DadosPessoaisEntity dadosPessoais;
-    private DocumentosEntity documentos;
-    private ContatoEntity contato;
-    private EnderecoEntity endereco;
-    private List<ClienteEntity> dependentes = new ArrayList<ClienteEntity>();
+	private DadosPessoaisEntity dadosPessoais;
+	private DocumentosEntity documentos;
+	private ContatoEntity contato;
+	private EnderecoEntity endereco;
+	private List<ClienteEntity> dependentes = new ArrayList<ClienteEntity>();
 
-    @Deprecated
-    public ClienteEntity(){}
+	@Deprecated
+	public ClienteEntity() {
+	}
 
-    public ClienteEntity(ClienteRecordDTO cliente) {
-        this.dadosPessoais = new DadosPessoaisEntity(cliente.dadosPessoais());
-        this.documentos = new DocumentosEntity(cliente.documentos());
-        this.contato = new ContatoEntity(cliente.contato());
-        this.endereco = new EnderecoEntity(cliente.endereco());
-    }   
+	public ClienteEntity(ClienteRecordDTO cliente) {
+		this.dadosPessoais = new DadosPessoaisEntity(cliente.dadosPessoais());
+		this.documentos = new DocumentosEntity(cliente.documentos());
+		this.contato = new ContatoEntity(cliente.contato());
+		this.endereco = new EnderecoEntity(cliente.endereco());
+	}
 
-    public void addDependente(ClienteEntity dependente){
-        this.dependentes.add(dependente);
-    }
+	
 
 }

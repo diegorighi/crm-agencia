@@ -16,4 +16,6 @@ public interface ClienteRepository extends MongoRepository<ClienteEntity, String
 
     boolean existsByDependentesDocumentosCpf(String cpf);
 
+	ClienteEntity findByDependentesDocumentosCpf(String cpfDependente);
+
 }

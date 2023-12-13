@@ -73,4 +73,9 @@ public class ClienteController {
         service.adicionarDependente(cpf, form);
     }
     
+    @DeleteMapping("/dependente/excluir/{cpf}/{cpfDependente}")
+	public void removerDependente(@PathVariable String cpf, @PathVariable String cpfDependente) {
+		service.removerDependente(cpf, cpfDependente);
+	}
+    
 }

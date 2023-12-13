@@ -91,6 +91,13 @@ public class ClienteService {
             throw new RuntimeException("Cliente não encontrado");
         }
     }
+    
+    private Boolean dependenteExiste(String cpf) {
+        if(repository.existsByDependentesDocumentosCpf(cpf))
+            return true;
+        else
+            return false;
+    }
 
     public void adicionarDependente(String cpf, ClienteRecordForm form) {
         if(existeCliente(cpf)){
@@ -100,18 +107,26 @@ public class ClienteService {
                 ClienteEntity mongoEntity = repository.findByDocumentosCpf(cpf);
                 ClienteEntity dependente = ClienteUtils.formToEntity(form);
     
-                mongoEntity.addDependente(dependente);
+                ClienteUtils.addDependente(dependente, mongoEntity.getDependentes());
                 repository.save(mongoEntity);
             }
         }else{
             throw new RuntimeException("Cliente não encontrado");
         }
     }
+    
+	public void removerDependente(String cpf, String cpfDependente) {
+		if (existeCliente(cpf)) {
+			if (dependenteExiste(cpfDependente)) {
+				ClienteEntity mongoEntity = repository.findByDocumentosCpf(cpf);
 
-    private Boolean dependenteExiste(String cpf) {
-        if(repository.existsByDependentesDocumentosCpf(cpf))
-            return true;
-        else
-            return false;
-    }
+                ClienteUtils.removeDependente(cpfDependente, mongoEntity.getDependentes());
+				repository.save(mongoEntity);
+			} else {
+				throw new RuntimeException("Dependente não encontrado");
+			}
+		} else {
+			throw new RuntimeException("Cliente não encontrado");
+		}
+	}
 }
