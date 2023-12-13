@@ -1,17 +1,17 @@
 # Define a imagem base
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17-oracle
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /docker-agencia-crm
 
 # Definir a variável de ambiente
 ARG ENV_PROFILE=dev
-ARG SPRINGBOOT_PORT=8080
+ARG DEFAULT_PORT=8080
 ARG SECRET_TOKEN=0123456789
 
-ENV SPRINGBOOT_PORT=$SPRINGBOOT_PORT
+ENV SPRINGBOOT_PORT=$DEFAULT_PORT
 
-ENV MONGODB_URI=mongodb+srv://root:LGpi8711!!@crm-agencia-hml.jlcodpb.mongodb.net/?retryWrites=true&w=majority
+ENV MONGODB_URI=mongodb+srv://root:LGpi8711@crm-agencia-hml.jlcodpb.mongodb.net/agencia
 ENV ENV_PROFILE=$ENV_PROFILE
 ENV SECRET_TOKEN=$SECRET_TOKEN
 

@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 @Configuration
-public class DevMongoDBConfiguration {
+public class MongoDBConfiguration {
     
     @Value("${mongodb.defined.uri}")
 	private String mongoDbConnectionUri;

@@ -108,7 +108,7 @@ public class ClienteService {
         }
     }
 
-    private boolean dependenteExiste(String cpf) {
+    private Boolean dependenteExiste(String cpf) {
         if(repository.existsByDependentesDocumentosCpf(cpf))
             return true;
         else

@@ -49,12 +49,6 @@ public class ClienteUtils {
         );
     }
 
-    private static List<ClienteRecordDTO> dependentesFormToDto(List<ClienteRecordForm> dependentes) {
-        return dependentes.stream()
-                .map(ClienteUtils::formTDto)
-                .collect(Collectors.toList());
-    }
-
     public static ClienteEntity dtoToEntity(ClienteRecordDTO dto) {
         return new ClienteEntity(dto);
     }
