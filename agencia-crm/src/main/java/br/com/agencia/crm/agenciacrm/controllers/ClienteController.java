@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +18,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.agencia.crm.agenciacrm.exceptions.ClienteJaCadastradoException;
+import br.com.agencia.crm.agenciacrm.exceptions.ClienteNaoEncontradoException;
+import br.com.agencia.crm.agenciacrm.exceptions.NaoExistemAlteracoesException;
+import br.com.agencia.crm.agenciacrm.models.entities.ClienteEntity;
 import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.wrapper.ResponseWrapper;
 import br.com.agencia.crm.agenciacrm.services.ClienteService;
+import br.com.agencia.crm.agenciacrm.utils.ClienteUtils;
+
 import org.springframework.data.domain.Sort;
 
 @RestController
@@ -35,11 +43,21 @@ public class ClienteController {
     }
 
     @PostMapping("/cadastrar")
-    public void cadastrarCliente(@RequestBody @Valid final ClienteRecordForm form) {
-        if(!service.existeCliente(form.cpf()))
-            service.cadastro(form);
-        else
-            throw new RuntimeException("Cliente já cadastrado");
+    public ResponseEntity<ResponseWrapper<ClienteRecordDTO>> cadastrarCliente(@RequestBody @Valid final ClienteRecordForm form) {
+        if(service.existeCliente(form.cpf())){
+            throw new ClienteJaCadastradoException("Cliente já cadastrado!");
+        }
+        else{
+            ClienteEntity cliente = ClienteUtils.formToEntity(form);
+            cliente = service.cadastro(cliente);
+    
+            ClienteRecordDTO novoCliente = ClienteUtils.entityToDto(cliente);
+            return ResponseEntity.status(
+            HttpStatus.CREATED).body(new ResponseWrapper<ClienteRecordDTO>(
+                        novoCliente, 
+                        "Cliente cadastrado com sucesso", 
+                        true));
+        }
     }   
 
     @GetMapping("/listar")
@@ -48,19 +66,38 @@ public class ClienteController {
         @RequestParam(value = "tamanho", defaultValue = "50") int tamanho) {
 
         PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.Direction.ASC, "nome");
-        Page<ClienteRecordDTO> listaClientes = service.listarClientes(pageRequest);
-        
-        return ResponseEntity.ok(listaClientes);
+        Page<ClienteEntity> listaClientes = service.listarClientes(pageRequest);
+
+        Page<ClienteRecordDTO> listaClientesDTO = listaClientes.map(ClienteUtils::entityToDto);
+        return ResponseEntity.ok(listaClientesDTO);
     }
 
     @GetMapping("/{cpf}")
     public ResponseEntity<ClienteRecordDTO> buscarClientePorCPF(@PathVariable String cpf) {
-        return ResponseEntity.ok(service.buscarClientePorCPF(cpf));
+        if(service.existeCliente(cpf)){
+            ClienteEntity cliente = service.buscarClientePorCPF(cpf);
+            ClienteRecordDTO dto = ClienteUtils.entityToDto(cliente);
+            return ResponseEntity.ok(dto);
+        }else{
+            throw new ClienteNaoEncontradoException("Cliente não encontrado!");
+        }
     }   
 
     @PutMapping("/editar/{cpf}") 
-    public ResponseEntity<ClienteRecordDTO> editarCliente(@PathVariable String cpf, @RequestBody @Valid final ClienteEditRecordForm form) {
-        return ResponseEntity.ok(service.editarCliente(cpf, form));
+    public ResponseEntity<ClienteRecordDTO> editarCliente(@PathVariable String cpf, 
+        @RequestBody @Valid final ClienteEditRecordForm form) {
+            if(service.existeCliente(cpf)){
+                if(service.exitemAlteracoes(cpf, form)){
+                    ClienteEntity cliente = service.buscarClientePorCPF(cpf);
+                    service.editarCliente(cliente, form);
+                    service.cadastro(cliente);
+                    ClienteRecordDTO entityToDto = ClienteUtils.entityToDto(cliente);
+                    return ResponseEntity.ok(entityToDto);
+                }else
+                    throw new NaoExistemAlteracoesException("Não há alterações a serem feitas!");
+                
+            }else
+                throw new ClienteNaoEncontradoException("Cliente não encontrado!");
     }   
 
     @DeleteMapping("/excluir/{cpf}")

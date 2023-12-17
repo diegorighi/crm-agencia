@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -17,73 +20,78 @@ import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteRecordForm;
 import br.com.agencia.crm.agenciacrm.repositories.ClienteRepository;
 import br.com.agencia.crm.agenciacrm.utils.ClienteUtils;
 
+/**
+ * Classe de serviço para Cliente
+ * @author Diego Righi
+ */
 @Service
 public class ClienteService {
 
     @Autowired
     private ClienteRepository repository;
 
-    @Transactional
-    public void cadastro(ClienteRecordForm form) {
-        if(!existeCliente(form.cpf())){
-            ClienteRecordDTO formTDto = ClienteUtils.formTDto(form);
-            ClienteEntity mongoEntity = ClienteUtils.dtoToEntity(formTDto);
-            repository.save(mongoEntity);
-        }else{
-            throw new RuntimeException("Cliente já cadastrado");
-        }
-    }
-
+    /**
+     * Coesão de responsabilidade: verifica se cliente já existe na base
+     * @param cpf do cliente
+     * @return true se cliente já existe, false se não existe
+     */
     public Boolean existeCliente(String cpf) {
         return repository.existsByDocumentosCpf(cpf);
     }
 
-    public Page<ClienteRecordDTO> listarClientes(PageRequest pageRequest) {
-        Page<ClienteEntity> mongoEntities = repository.findAll(pageRequest);
-
-        List<ClienteRecordDTO> clienteRecordDTOs = mongoEntities.stream()
-                .map(ClienteUtils::entityToDto)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(clienteRecordDTOs, pageRequest, mongoEntities.getTotalElements());
+    /**
+     * Coesão de responsabilidade: cadastra cliente na base
+     * @param mongoEntity cliente a ser cadastrado
+     * @return mongoEntity salvo
+     */
+    @Transactional
+    public ClienteEntity cadastro(ClienteEntity mongoEntity) {
+        return repository.save(mongoEntity);
     }
 
-    public ClienteRecordDTO buscarClientePorCPF(String cpf) {
-        ClienteEntity mongoEntity = repository.findByDocumentosCpf(cpf);
-        return ClienteUtils.entityToDto(mongoEntity);
+    /**
+     * Coesão de responsabilidade: lista todos os clientes da base
+     * @param pageRequest
+     * @return lista de clientes paginada
+     */
+    public Page<ClienteEntity> listarClientes(PageRequest pageRequest) {
+        Page<ClienteEntity> mongoEntities = repository.findAll(pageRequest);
+        return new PageImpl<>(mongoEntities.getContent(), pageRequest, mongoEntities.getTotalElements());
+    }
+
+    @Cacheable(value = "cliente", key = "#cpf", unless = "#result == null || #exception != null")
+    public ClienteEntity buscarClientePorCPF(String cpf) {
+        return repository.findByDocumentosCpf(cpf);
+    }
+
+    public Boolean exitemAlteracoes(String cpf, ClienteEditRecordForm form) {
+        ClienteEntity cliente = repository.findByDocumentosCpf(cpf);
+        return ClienteUtils.comparaFormComEntity(form, cliente);
     }
 
     @Transactional
-    public ClienteRecordDTO editarCliente(String cpf, ClienteEditRecordForm form){
-        //Verifica se cliente existe na base
-        if(existeCliente(cpf)){
-            //Busca cliente na base
-            ClienteEntity mongoEntity = repository.findByDocumentosCpf(cpf);
-            //Atualiza dados do cliente
-            mongoEntity.getDadosPessoais().setSobrenome(form.sobrenome());
-            mongoEntity.getDadosPessoais().setEstadoCivil(form.estadoCivil().getEstadoCivil()); 
-            mongoEntity.getDadosPessoais().setProfissao(form.profissao());  
-            mongoEntity.getDocumentos().setPassaporte(form.passaporte());
-            mongoEntity.getDocumentos().setDataVencimentoPassaporte(form.dataVencimentoPassaporte());
-            mongoEntity.getContato().setEmail(form.email());
-            mongoEntity.getContato().setCelular(form.celular());
-            mongoEntity.getEndereco().setLogradouro(form.logradouro()); 
-            mongoEntity.getEndereco().setNumero(form.numero());
-            mongoEntity.getEndereco().setComplemento(form.complemento());
-            mongoEntity.getEndereco().setCidade(form.cidade());
-            mongoEntity.getEndereco().setUf(form.uf().getUf());
-            mongoEntity.getEndereco().setCep(form.cep());
-            mongoEntity.getEndereco().setPais(form.pais());
-            //Salva alterações  
-            repository.save(mongoEntity);
-            //Retorna cliente atualizado
-            return ClienteUtils.entityToDto(mongoEntity);
-
-        }else{
-            throw new RuntimeException("Cliente não encontrado");
-        }
+    @CachePut(value = "cliente", key = "#cliente.documentos.cpf")
+    public ClienteEntity editarCliente(ClienteEntity cliente, ClienteEditRecordForm form){
+        //Atualiza dados do cliente
+        cliente.getDadosPessoais().setSobrenome(form.sobrenome());
+        cliente.getDadosPessoais().setEstadoCivil(form.estadoCivil().getEstadoCivil()); 
+        cliente.getDadosPessoais().setProfissao(form.profissao());  
+        cliente.getDocumentos().setPassaporte(form.passaporte());
+        cliente.getDocumentos().setDataVencimentoPassaporte(form.dataVencimentoPassaporte());
+        cliente.getContato().setEmail(form.email());
+        cliente.getContato().setCelular(form.celular());
+        cliente.getEndereco().setLogradouro(form.logradouro()); 
+        cliente.getEndereco().setNumero(form.numero());
+        cliente.getEndereco().setComplemento(form.complemento());
+        cliente.getEndereco().setCidade(form.cidade());
+        cliente.getEndereco().setUf(form.uf().getUf());
+        cliente.getEndereco().setCep(form.cep());
+        cliente.getEndereco().setPais(form.pais());
+        
+        return cliente;
     }
 
+    @CacheEvict(value = "clientes", key = "#cpf")
     public void removerCliente(String cpf) {
         if(existeCliente(cpf)){
             repository.deleteByDocumentosCpf(cpf);
@@ -91,14 +99,8 @@ public class ClienteService {
             throw new RuntimeException("Cliente não encontrado");
         }
     }
-    
-    private Boolean dependenteExiste(String cpf) {
-        if(repository.existsByDependentesDocumentosCpf(cpf))
-            return true;
-        else
-            return false;
-    }
 
+    @CachePut(value = "clientes", key = "#cpf")
     public void adicionarDependente(String cpf, ClienteRecordForm form) {
         if(existeCliente(cpf)){
             if(dependenteExiste(form.cpf())){
@@ -115,6 +117,7 @@ public class ClienteService {
         }
     }
     
+    @CacheEvict(value = "clientes", key = "#cpf")
 	public void removerDependente(String cpf, String cpfDependente) {
 		if (existeCliente(cpf)) {
 			if (dependenteExiste(cpfDependente)) {
@@ -129,4 +132,20 @@ public class ClienteService {
 			throw new RuntimeException("Cliente não encontrado");
 		}
 	}
+
+    //Converte lista de entidades para lista de DTOs
+    private List<ClienteRecordDTO> converteListaEntityParaListaDTO(Page<ClienteEntity> mongoEntities) {
+        List<ClienteRecordDTO> clienteRecordDTOs = mongoEntities.stream()
+                .map(ClienteUtils::entityToDto)
+                .collect(Collectors.toList());
+        return clienteRecordDTOs;
+    }
+
+    //Verifica se dependente existe na base
+    private Boolean dependenteExiste(String cpf) {
+        if(repository.existsByDependentesDocumentosCpf(cpf))
+            return true;
+        else
+            return false;
+    }
 }

@@ -13,6 +13,7 @@ import br.com.agencia.crm.agenciacrm.models.records.dto.ContatoRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DadosPessoaisRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DocumentosRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.EnderecoRecordDTO;
+import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteRecordForm;
 
 public class ClienteUtils {
@@ -111,5 +112,41 @@ public class ClienteUtils {
 	        }
 	    }
 	}
+
+    public static Boolean comparaFormComEntity(ClienteEditRecordForm form, ClienteEntity entity) {
+        Boolean alteracoes = false;
+
+        if(!form.sobrenome().equals(entity.getDadosPessoais().getSobrenome()))
+            alteracoes = true;
+        if(!form.estadoCivil().equals(EstadoCivilEnum.fromString(entity.getDadosPessoais().getEstadoCivil())))
+            alteracoes = true; 
+        if(!form.profissao().equals(entity.getDadosPessoais().getProfissao()))
+            alteracoes = true;
+        if(!form.passaporte().equals(entity.getDocumentos().getPassaporte()))
+            alteracoes = true;
+        if(!form.dataVencimentoPassaporte().equals(entity.getDocumentos().getDataVencimentoPassaporte()))
+            alteracoes = true;
+        if(!form.email().equals(entity.getContato().getEmail()))
+            alteracoes = true;
+        if(!form.celular().equals(entity.getContato().getCelular()))
+            alteracoes = true;
+        if(!form.logradouro().equals(entity.getEndereco().getLogradouro()))
+            alteracoes = true;
+        if(!form.numero().equals(entity.getEndereco().getNumero()))
+            alteracoes = true;
+        if(!form.complemento().equals(entity.getEndereco().getComplemento()))
+            alteracoes = true;
+        if(!form.cidade().equals(entity.getEndereco().getCidade()))
+            alteracoes = true;
+        if(!form.uf().equals(UfEnum.fromString(entity.getEndereco().getCidade())))
+            alteracoes = true;
+        if(!form.cep().equals(entity.getEndereco().getCep()))
+            alteracoes = true;
+        if(!form.pais().equals(entity.getEndereco().getPais()))
+            alteracoes = true;
+        
+
+        return alteracoes;
+    }
 
 }
