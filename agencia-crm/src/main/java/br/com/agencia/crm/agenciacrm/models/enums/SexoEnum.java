@@ -19,7 +19,7 @@ public enum SexoEnum {
         throw new IllegalArgumentException("No enum constant " + sexoStr);
     }
 
-    public String getSexo() {
+    public String getDescricao() {
         return sexo;
     }
 }

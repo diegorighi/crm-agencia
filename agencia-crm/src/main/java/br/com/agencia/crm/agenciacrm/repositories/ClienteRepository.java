@@ -18,4 +18,6 @@ public interface ClienteRepository extends MongoRepository<ClienteEntity, String
 
 	ClienteEntity findByDependentesDocumentosCpf(String cpfDependente);
 
+    ClienteEntity findByDocumentosCpfOrDependentesDocumentosCpf(String cpfTitular, String cpfDependente);
+
 }

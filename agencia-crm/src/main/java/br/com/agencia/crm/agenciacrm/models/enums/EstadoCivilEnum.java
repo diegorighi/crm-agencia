@@ -23,7 +23,7 @@ public enum EstadoCivilEnum {
         throw new IllegalArgumentException("No enum constant " + estadoCivilStr);
     }
 
-    public String getEstadoCivil() {
+    public String getDescricao() {
         return estadoCivil;
     }
 }

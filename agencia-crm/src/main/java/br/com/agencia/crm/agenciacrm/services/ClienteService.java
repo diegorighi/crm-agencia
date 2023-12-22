@@ -1,8 +1,10 @@
 package br.com.agencia.crm.agenciacrm.services;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -13,10 +15,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.agencia.crm.agenciacrm.exceptions.ClienteNaoEncontradoException;
+import br.com.agencia.crm.agenciacrm.exceptions.DependenteException;
 import br.com.agencia.crm.agenciacrm.models.entities.ClienteEntity;
 import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteRecordForm;
+import br.com.agencia.crm.agenciacrm.models.wrapper.ResponseWrapper;
 import br.com.agencia.crm.agenciacrm.repositories.ClienteRepository;
 import br.com.agencia.crm.agenciacrm.utils.ClienteUtils;
 
@@ -64,9 +69,12 @@ public class ClienteService {
         return repository.findByDocumentosCpf(cpf);
     }
 
-    public Boolean exitemAlteracoes(String cpf, ClienteEditRecordForm form) {
-        ClienteEntity cliente = repository.findByDocumentosCpf(cpf);
-        return ClienteUtils.comparaFormComEntity(form, cliente);
+    public HashMap<String, Object> exitemAlteracoes(ClienteEditRecordForm form, ClienteEntity titular, HashMap<String, Object> alteracoesMap) {
+        return ClienteUtils.comparaFormComEntity(form, titular, alteracoesMap);
+    }
+
+    public HashMap<String, Object> existemAlteracoesDependente(ClienteEditRecordForm form, ClienteEntity dependente, HashMap<String, Object> alteracoesMap) {
+        return ClienteUtils.comparaFormComEntity(form, dependente, alteracoesMap);
     }
 
     @Transactional
@@ -74,24 +82,27 @@ public class ClienteService {
     public ClienteEntity editarCliente(ClienteEntity cliente, ClienteEditRecordForm form){
         //Atualiza dados do cliente
         cliente.getDadosPessoais().setSobrenome(form.sobrenome());
-        cliente.getDadosPessoais().setEstadoCivil(form.estadoCivil().getEstadoCivil()); 
+        cliente.getDadosPessoais().setEstadoCivil(form.estadoCivil().getDescricao()); 
         cliente.getDadosPessoais().setProfissao(form.profissao());  
+        cliente.getPreferencias().setPreferenciaClasse(form.preferenciaClasse().getDescricao());
+        cliente.getPreferencias().setPreferenciaAssento(form.preferenciaAssento().getDescricao());
+        cliente.getPreferencias().setPreferenciaRefeicao(form.preferenciaRefeicao().getDescricao());
         cliente.getDocumentos().setPassaporte(form.passaporte());
         cliente.getDocumentos().setDataVencimentoPassaporte(form.dataVencimentoPassaporte());
-        cliente.getContato().setEmail(form.email());
-        cliente.getContato().setCelular(form.celular());
+        cliente.getContatos().setEmail(form.email());
+        cliente.getContatos().setCelular(form.celular());
         cliente.getEndereco().setLogradouro(form.logradouro()); 
         cliente.getEndereco().setNumero(form.numero());
         cliente.getEndereco().setComplemento(form.complemento());
         cliente.getEndereco().setCidade(form.cidade());
-        cliente.getEndereco().setUf(form.uf().getUf());
+        cliente.getEndereco().setUf(form.uf().getDescricao());
         cliente.getEndereco().setCep(form.cep());
         cliente.getEndereco().setPais(form.pais());
         
         return cliente;
     }
 
-    @CacheEvict(value = "clientes", key = "#cpf")
+    @CacheEvict(value = "cliente", key = "#cpf")
     public void removerCliente(String cpf) {
         if(existeCliente(cpf)){
             repository.deleteByDocumentosCpf(cpf);
@@ -100,27 +111,18 @@ public class ClienteService {
         }
     }
 
-    @CachePut(value = "clientes", key = "#cpf")
-    public void adicionarDependente(String cpf, ClienteRecordForm form) {
-        if(existeCliente(cpf)){
-            if(dependenteExiste(form.cpf())){
-                throw new RuntimeException("Dependente já cadastrado");
-            }else{
-                ClienteEntity mongoEntity = repository.findByDocumentosCpf(cpf);
-                ClienteEntity dependente = ClienteUtils.formToEntity(form);
-    
-                ClienteUtils.addDependente(dependente, mongoEntity.getDependentes());
-                repository.save(mongoEntity);
-            }
-        }else{
-            throw new RuntimeException("Cliente não encontrado");
-        }
+    @CachePut(value = "cliente", key = "#mongoEntity.documentos.cpf")
+    public ClienteEntity adicionarDependente(ClienteEntity mongoEntity, ClienteRecordForm form) {
+        ClienteEntity dependente = ClienteUtils.formToEntity(form);
+
+        ClienteUtils.addDependente(dependente, mongoEntity.getDependentes());
+        return repository.save(mongoEntity);
     }
     
-    @CacheEvict(value = "clientes", key = "#cpf")
+    @CacheEvict(value = "cliente", key = "#cpf")
 	public void removerDependente(String cpf, String cpfDependente) {
 		if (existeCliente(cpf)) {
-			if (dependenteExiste(cpfDependente)) {
+			if (buscarDependentePorCPF(cpfDependente) != null) {
 				ClienteEntity mongoEntity = repository.findByDocumentosCpf(cpf);
 
                 ClienteUtils.removeDependente(cpfDependente, mongoEntity.getDependentes());
@@ -133,19 +135,7 @@ public class ClienteService {
 		}
 	}
 
-    //Converte lista de entidades para lista de DTOs
-    private List<ClienteRecordDTO> converteListaEntityParaListaDTO(Page<ClienteEntity> mongoEntities) {
-        List<ClienteRecordDTO> clienteRecordDTOs = mongoEntities.stream()
-                .map(ClienteUtils::entityToDto)
-                .collect(Collectors.toList());
-        return clienteRecordDTOs;
-    }
-
-    //Verifica se dependente existe na base
-    private Boolean dependenteExiste(String cpf) {
-        if(repository.existsByDependentesDocumentosCpf(cpf))
-            return true;
-        else
-            return false;
+    public ClienteEntity buscarDependentePorCPF(String cpfDependente) {
+        return repository.findByDependentesDocumentosCpf(cpfDependente);
     }
 }

@@ -14,7 +14,7 @@ import lombok.Setter;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "contato")
+@Document(collection = "contatos")
 public class ContatoEntity {
 
     private String email;

@@ -39,14 +39,14 @@ public enum UfEnum {
 
     public static UfEnum fromString(String ufStr) {
         for (UfEnum uf : UfEnum.values()) {
-            if (uf.getUf().equalsIgnoreCase(ufStr)) {
+            if (uf.getDescricao().equalsIgnoreCase(ufStr)) {
                 return uf;
             }
         }
         throw new IllegalArgumentException("No enum constant " + ufStr);
     }
 
-    public String getUf() {
+    public String getDescricao() {
         return uf;
     }
 }

@@ -30,7 +30,7 @@ public class EnderecoEntity {
         this.numero = endereco.numero();
         this.complemento = endereco.complemento();
         this.cidade = endereco.cidade();
-        this.uf = endereco.uf().getUf();
+        this.uf = endereco.uf().getDescricao();
         this.cep = endereco.cep();
         this.pais = endereco.pais();
     }

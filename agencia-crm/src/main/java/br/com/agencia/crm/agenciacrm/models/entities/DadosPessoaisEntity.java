@@ -34,8 +34,8 @@ public class DadosPessoaisEntity {
         this.nomeDoMeio = dadosPessoais.nomeDoMeio();
         this.sobrenome = dadosPessoais.sobrenome();
         this.dataNascimento = dadosPessoais.dataNascimento();
-        this.sexo = dadosPessoais.sexo().getSexo();
-        this.estadoCivil = dadosPessoais.estadoCivil().getEstadoCivil();
+        this.sexo = dadosPessoais.sexo().getDescricao();
+        this.estadoCivil = dadosPessoais.estadoCivil().getDescricao();
         this.profissao = dadosPessoais.profissao();
     }
 
