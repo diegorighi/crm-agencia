@@ -2,6 +2,7 @@ package br.com.agencia.crm.agenciacrm.models.enums;
 
 public enum PreferenciaClasseEnum {
     ECONOMICA("Econômica"),
+    PREMIUM("Premium"),
     EXECUTIVA("Executiva"),
     PRIMEIRA_CLASSE("Primeira Classe");
 

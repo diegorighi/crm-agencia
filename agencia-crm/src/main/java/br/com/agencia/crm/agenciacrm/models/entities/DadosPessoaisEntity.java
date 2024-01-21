@@ -16,12 +16,17 @@ import lombok.Setter;
 @Document(collection = "dadosPessoais")
 public class DadosPessoaisEntity {
 
+    @Setter
     private String primeiroNome;
+    
+    @Setter
     private String nomeDoMeio;
 
     @Setter
     private String sobrenome;
     private String dataNascimento;
+
+    @Setter
     private String sexo;
 
     @Setter

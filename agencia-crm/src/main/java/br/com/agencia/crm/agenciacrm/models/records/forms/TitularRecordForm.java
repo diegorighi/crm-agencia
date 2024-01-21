@@ -1,8 +1,9 @@
 package br.com.agencia.crm.agenciacrm.models.records.forms;
 
-import java.time.LocalDate;
+import java.util.UUID;
 
 import org.hibernate.validator.constraints.br.CPF;
+import org.springframework.data.mongodb.core.mapping.Unwrapped.Empty;
 
 import br.com.agencia.crm.agenciacrm.models.enums.EstadoCivilEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaAssentoEnum;
@@ -16,7 +17,10 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record ClienteRecordForm(
+public record TitularRecordForm(
+
+    @Empty String parent_id,
+
     @NotEmpty(message = "O primeiro nome não pode estar vazio.")
     @Size(min = 2, max = 50, message = "O primeiro nome deve ter entre 2 e 50 caracteres.")
     String primeiroNome,
@@ -92,4 +96,17 @@ public record ClienteRecordForm(
     @NotEmpty(message = "O país não pode estar vazio.")
     @Size(max = 50, message = "O país não deve exceder 50 caracteres.")
     String pais
-) {}
+) implements ClienteForm {
+    @Override
+    public String getCpf() {
+        return this.cpf;
+    }
+
+    @Override
+    public String parent_id() {
+        return this.parent_id;
+    }
+
+   
+    
+}

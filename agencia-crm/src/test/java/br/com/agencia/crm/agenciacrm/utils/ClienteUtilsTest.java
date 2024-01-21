@@ -3,37 +3,36 @@ package br.com.agencia.crm.agenciacrm.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.com.agencia.crm.agenciacrm.models.entities.ClienteEntity;
-import br.com.agencia.crm.agenciacrm.models.entities.DadosPessoaisEntity;
-import br.com.agencia.crm.agenciacrm.models.entities.PreferenciasEntity;
+import br.com.agencia.crm.agenciacrm.models.entities.TitularEntity;
 import br.com.agencia.crm.agenciacrm.models.enums.EstadoCivilEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaAssentoEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaClasseEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaRefeicaoEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.SexoEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.UfEnum;
-import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.ContatoRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DadosPessoaisRecordDTO;
+import br.com.agencia.crm.agenciacrm.models.records.dto.DependenteRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DocumentosRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.EnderecoRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.PreferenciasRecordDTO;
-import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.dto.TitularRecordDTO;
+import br.com.agencia.crm.agenciacrm.models.records.forms.TitularRecordForm;
 
 public class ClienteUtilsTest {
 
-    private ClienteRecordForm clienteForm;
-    private ClienteEntity clienteEntity;
-    private ClienteRecordDTO clienteRecordDTO;
+    private TitularRecordForm clienteForm;
+    private TitularEntity clienteEntity;
+    private TitularRecordDTO clienteRecordDTO;
 
     @BeforeEach
     public void init(){
-        clienteForm = new ClienteRecordForm(
+        clienteForm = new TitularRecordForm(
+            "",
             "João",
             "Carlos",
             "Silva",
@@ -57,22 +56,22 @@ public class ClienteUtilsTest {
             "01234-567",
             "Brasil"
         );
-        clienteRecordDTO = new ClienteRecordDTO(
+        clienteRecordDTO = new TitularRecordDTO(
             new DadosPessoaisRecordDTO("João", "Carlos", "Silva", "13/04/1988", SexoEnum.MASCULINO, EstadoCivilEnum.CASADO, "Engenheiro"),
             new PreferenciasRecordDTO(PreferenciaClasseEnum.ECONOMICA, PreferenciaAssentoEnum.JANELA, PreferenciaRefeicaoEnum.VEGETARIANA),
             new DocumentosRecordDTO("335.192.518-25", "AB12345", "30/08/2028"),
             new ContatoRecordDTO("joao.silva@email.com","11999887766"),
             new EnderecoRecordDTO("Rua das Flores", 123, "Apto 101", "São Paulo", UfEnum.SP, "01234-567", "Brasil"),
-            new ArrayList<ClienteRecordDTO>()
+            new ArrayList<DependenteRecordDTO>()
         );
-        clienteEntity = new ClienteEntity(clienteRecordDTO);
+        clienteEntity = new TitularEntity(clienteRecordDTO);
         
     }
     
     @Test
     public void testaFormToDTOComValoresCorretos(){
         // Converter o ClienteRecordForm para ClienteRecordDTO
-        ClienteRecordDTO dto = ClienteUtils.formToDto(clienteForm);
+        TitularRecordDTO dto = ClienteUtils.titularFormToDto(clienteForm);
 
         // Verificar se a conversão está correta
         assertEquals(clienteForm.primeiroNome(), dto.dadosPessoais().primeiroNome());
@@ -101,7 +100,7 @@ public class ClienteUtilsTest {
 
     @Test
     public void testaDtoToEntityComValoresCorretos(){
-        ClienteEntity entity = ClienteUtils.dtoToEntity(clienteRecordDTO);
+        TitularEntity entity = ClienteUtils.titularDtoToEntity(clienteRecordDTO);
         assertEquals(entity.getDadosPessoais().getPrimeiroNome(), clienteRecordDTO.dadosPessoais().primeiroNome());
         assertEquals(entity.getDadosPessoais().getNomeDoMeio(), clienteRecordDTO.dadosPessoais().nomeDoMeio());
         assertEquals(entity.getDadosPessoais().getSobrenome(), clienteRecordDTO.dadosPessoais().sobrenome());
@@ -127,7 +126,7 @@ public class ClienteUtilsTest {
     }
 
     public void testaEntityToDtoComValoresCorretos(){
-        ClienteRecordDTO dto = ClienteUtils.entityToDto(clienteEntity);
+        TitularRecordDTO dto = ClienteUtils.titularEntityToDto(clienteEntity);
         assertEquals(dto.dadosPessoais().primeiroNome(), clienteEntity.getDadosPessoais().getPrimeiroNome());
         assertEquals(dto.dadosPessoais().nomeDoMeio(), clienteEntity.getDadosPessoais().getNomeDoMeio());
         assertEquals(dto.dadosPessoais().sobrenome(), clienteEntity.getDadosPessoais().getSobrenome());

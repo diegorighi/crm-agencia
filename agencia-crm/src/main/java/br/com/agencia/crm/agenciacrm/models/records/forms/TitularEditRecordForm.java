@@ -6,7 +6,7 @@ import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaClasseEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaRefeicaoEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.UfEnum;
 
-public record ClienteEditRecordForm(
+public record TitularEditRecordForm(
     String sobrenome,
     EstadoCivilEnum estadoCivil,
     String profissao,

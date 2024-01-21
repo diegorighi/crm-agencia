@@ -6,7 +6,7 @@ import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaClasseEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaRefeicaoEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.SexoEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.UfEnum;
-import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.forms.TitularRecordForm;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -25,8 +25,9 @@ public class CadastroClienteTest {
         validator = factory.getValidator();
     }
 
-    private ClienteRecordForm criarClienteFormComCPF(String cpf) {
-        return new ClienteRecordForm(
+    private TitularRecordForm criarClienteFormComCPF(String cpf) {
+        return new TitularRecordForm(
+            "",
             "João",
             "Carlos",
             "Silva",
@@ -54,14 +55,14 @@ public class CadastroClienteTest {
 
     @Test
     public void valoresCorretosClienteRecordForm() {
-        ClienteRecordForm clienteForm = criarClienteFormComCPF("335.192.518-25");
+        TitularRecordForm clienteForm = criarClienteFormComCPF("335.192.518-25");
         var violations = validator.validate(clienteForm);
         assertTrue(violations.isEmpty());
     }
 
     @Test
     public void cpfInvalidoClienteRecordForm() {
-        ClienteRecordForm clienteForm = criarClienteFormComCPF("123.456.789-00");
+        TitularRecordForm clienteForm = criarClienteFormComCPF("123.456.789-00");
         var violations = validator.validate(clienteForm);
         assertFalse(violations.isEmpty());
     }

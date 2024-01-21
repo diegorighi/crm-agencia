@@ -1,23 +1,18 @@
 package br.com.agencia.crm.agenciacrm.repositories;
 
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-import br.com.agencia.crm.agenciacrm.models.entities.ClienteEntity;
 
-@Repository
-public interface ClienteRepository extends MongoRepository<ClienteEntity, String>{
+@NoRepositoryBean
+public interface ClienteRepository<T> extends MongoRepository<T, String>{
 
-    Boolean existsByDocumentosCpf(String cpf);
+    Boolean existsByDocumentos_Cpf(String cpf);
 
-    ClienteEntity findByDocumentosCpf(String cpf);
+    Optional<T> findByDocumentos_Cpf(String cpf);
 
     void deleteByDocumentosCpf(String cpf);
-
-    boolean existsByDependentesDocumentosCpf(String cpf);
-
-	ClienteEntity findByDependentesDocumentosCpf(String cpfDependente);
-
-    ClienteEntity findByDocumentosCpfOrDependentesDocumentosCpf(String cpfTitular, String cpfDependente);
 
 }

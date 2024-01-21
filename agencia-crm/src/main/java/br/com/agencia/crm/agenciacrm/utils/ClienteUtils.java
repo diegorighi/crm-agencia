@@ -5,9 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import br.com.agencia.crm.agenciacrm.models.entities.ClienteEntity;
+import br.com.agencia.crm.agenciacrm.models.entities.TitularEntity;
 import br.com.agencia.crm.agenciacrm.models.entities.ContatoEntity;
 import br.com.agencia.crm.agenciacrm.models.entities.DadosPessoaisEntity;
+import br.com.agencia.crm.agenciacrm.models.entities.DependenteEntity;
 import br.com.agencia.crm.agenciacrm.models.entities.DocumentosEntity;
 import br.com.agencia.crm.agenciacrm.models.entities.EnderecoEntity;
 import br.com.agencia.crm.agenciacrm.models.entities.PreferenciasEntity;
@@ -17,19 +18,22 @@ import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaClasseEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaRefeicaoEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.SexoEnum;
 import br.com.agencia.crm.agenciacrm.models.enums.UfEnum;
-import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteRecordDTO;
+import br.com.agencia.crm.agenciacrm.models.records.dto.TitularRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.ContatoRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DadosPessoaisRecordDTO;
+import br.com.agencia.crm.agenciacrm.models.records.dto.DependenteRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DocumentosRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.EnderecoRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.PreferenciasRecordDTO;
-import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteEditRecordForm;
-import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.forms.TitularEditRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.forms.DependenteEditRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.forms.DependenteRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.forms.TitularRecordForm;
 
 public class ClienteUtils {
 
-    public static ClienteRecordDTO formToDto(ClienteRecordForm form) {
-        return new ClienteRecordDTO(
+    public static TitularRecordDTO titularFormToDto(TitularRecordForm form) {
+        return new TitularRecordDTO(
             new DadosPessoaisRecordDTO(
                 form.primeiroNome(),
                 form.nomeDoMeio(),
@@ -66,12 +70,32 @@ public class ClienteUtils {
         );
     }
 
-    public static ClienteEntity dtoToEntity(ClienteRecordDTO dto) {
-        return new ClienteEntity(dto);
+    public static DependenteRecordDTO dependenteFormToDto(DependenteRecordForm form) {
+        return new DependenteRecordDTO(
+            form.parent_id(),
+            new DadosPessoaisRecordDTO(
+                form.primeiroNome(),
+                form.nomeDoMeio(),
+                form.sobrenome(),
+                form.dataNascimento(),
+                form.sexo(),
+                form.estadoCivil(),
+                form.profissao()
+            ),
+            new DocumentosRecordDTO(
+                form.cpf(),
+                form.passaporte(),
+                form.dataVencimentoPassaporte()
+            )
+        );
     }
 
-    public static ClienteRecordDTO entityToDto(ClienteEntity entity) {
-        return new ClienteRecordDTO(
+    public static TitularEntity titularDtoToEntity(TitularRecordDTO dto) {
+        return new TitularEntity(dto);
+    }
+
+    public static TitularRecordDTO titularEntityToDto(TitularEntity entity) {
+        return new TitularRecordDTO(
                     new DadosPessoaisRecordDTO(
                         entity.getDadosPessoais().getPrimeiroNome(),
                         entity.getDadosPessoais().getNomeDoMeio(),
@@ -108,24 +132,28 @@ public class ClienteUtils {
                 );
     }
 
-    private static List<ClienteRecordDTO> dependentesEntityToDto(List<ClienteEntity> dependentes) {
+    private static List<DependenteRecordDTO> dependentesEntityToDto(List<DependenteEntity> dependentes) {
         return dependentes.stream()
-                .map(ClienteUtils::entityToDto)
+                .map(ClienteUtils::dependenteEntityToDto)
                 .collect(Collectors.toList());
     }
 
-    public static ClienteEntity formToEntity(ClienteRecordForm form) {
-        return new ClienteEntity(formToDto(form));
+    public static TitularEntity titularFormToEntity(TitularRecordForm form) {
+        return new TitularEntity(titularFormToDto(form));
     }
 
-    public static void addDependente(ClienteEntity dependente, List<ClienteEntity> dependentes) {
+    public static DependenteEntity dependenteFormToEntity(DependenteRecordForm form) {
+        return new DependenteEntity(dependenteFormToDto(form));
+    }
+
+    public static void addDependente(TitularEntity dependente, List<TitularEntity> dependentes) {
 		dependentes.add(dependente);
 	}
 
-	public static void removeDependente(String cpfDependente, List<ClienteEntity> dependentes) {
-	    Iterator<ClienteEntity> iterator = dependentes.iterator();
+	public static void removeDependente(String cpfDependente, List<TitularEntity> dependentes) {
+	    Iterator<TitularEntity> iterator = dependentes.iterator();
 	    while (iterator.hasNext()) {
-	        ClienteEntity dependente = iterator.next();
+	        TitularEntity dependente = iterator.next();
 	        if (cpfDependente.equals(dependente.getDocumentos().getCpf())) {
 	            iterator.remove();
 	            return;
@@ -133,7 +161,7 @@ public class ClienteUtils {
 	    }
 	}
 
-    public static HashMap<String, Object> comparaFormComEntity(ClienteEditRecordForm form, ClienteEntity entity, HashMap<String, Object> alteracoesMap) {
+    public static HashMap<String, Object> comparaFormComEntity(TitularEditRecordForm form, TitularEntity entity, HashMap<String, Object> alteracoesMap) {
 
         if(!form.sobrenome().equals(entity.getDadosPessoais().getSobrenome())){
             alteracoesMap.put("sobrenome", form.sobrenome());
@@ -194,10 +222,57 @@ public class ClienteUtils {
         return alteracoesMap;
     }
 
+    public static HashMap<String, Object> comparaFormComEntity(DependenteEditRecordForm form, DependenteEntity entity, HashMap<String, Object> alteracoesMap) {
+
+        if(!form.primeiroNome().equals(entity.getDadosPessoais().getPrimeiroNome())){
+            alteracoesMap.put("primeiroNome", form.primeiroNome());
+        }
+        if(!form.nomeDoMeio().equals(entity.getDadosPessoais().getNomeDoMeio())){
+            alteracoesMap.put("nomeDoMeio", form.nomeDoMeio());
+        }
+        if(!form.sobrenome().equals(entity.getDadosPessoais().getSobrenome())){
+            alteracoesMap.put("sobrenome", form.sobrenome());
+        }
+        if(!form.estadoCivil().equals(EstadoCivilEnum.fromString(entity.getDadosPessoais().getEstadoCivil()))){
+            alteracoesMap.put("estadoCivil", form.estadoCivil());
+        }
+        if(!form.profissao().equals(entity.getDadosPessoais().getProfissao())){
+            alteracoesMap.put("profissao", form.profissao());
+        }
+        if(!form.passaporte().equals(entity.getDocumentos().getPassaporte())){
+            alteracoesMap.put("passaporte", form.passaporte());
+        }
+        if(!form.dataVencimentoPassaporte().equals(entity.getDocumentos().getDataVencimentoPassaporte())){
+            alteracoesMap.put("dataVencimentoPassaporte", form.dataVencimentoPassaporte());
+        }
+
+        return alteracoesMap;
+    }
+
     public static <T> HashMap<String, T> mapeamentoAlteracoes(String campo, T valor){
         HashMap<String, T> alteracoes = new HashMap<>();
         alteracoes.put(campo, valor);
         return alteracoes;
+    }
+
+    public static DependenteRecordDTO dependenteEntityToDto(DependenteEntity dependente) {
+        return new DependenteRecordDTO(
+            dependente.getParentId(),
+            new DadosPessoaisRecordDTO(
+                dependente.getDadosPessoais().getPrimeiroNome(),
+                dependente.getDadosPessoais().getNomeDoMeio(),
+                dependente.getDadosPessoais().getSobrenome(),
+                dependente.getDadosPessoais().getDataNascimento(),
+                SexoEnum.fromString(dependente.getDadosPessoais().getSexo()),
+                EstadoCivilEnum.fromString(dependente.getDadosPessoais().getEstadoCivil()),
+                dependente.getDadosPessoais().getProfissao()
+            ),
+            new DocumentosRecordDTO(
+                dependente.getDocumentos().getCpf(),
+                dependente.getDocumentos().getPassaporte(),
+                dependente.getDocumentos().getDataVencimentoPassaporte()
+            )
+        );
     }
 
 }
