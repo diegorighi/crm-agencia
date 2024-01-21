@@ -21,10 +21,10 @@ import br.com.agencia.crm.agenciacrm.models.entities.DependenteEntity;
 import br.com.agencia.crm.agenciacrm.models.entities.TitularEntity;
 import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DependenteRecordDTO;
-import br.com.agencia.crm.agenciacrm.models.records.forms.TitularEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.ClienteForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.DependenteEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.DependenteRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.forms.TitularEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.TitularRecordForm;
 import br.com.agencia.crm.agenciacrm.repositories.ClienteRepository;
 import br.com.agencia.crm.agenciacrm.repositories.DependenteClienteRepository;
@@ -285,15 +285,5 @@ public class ClienteService {
     public DependenteRecordDTO updateCacheAndReturnDto(DependenteEntity dependenteEntity) {
         return ClienteUtils.dependenteEntityToDto(dependenteEntity);
     }
-
-    public Optional<DependenteEntity> buscarDependentePorCPF(String cpfDependente) {
-        Optional<DependenteEntity> dependente = dependenteRepository.findByDocumentos_Cpf(cpfDependente);
-        if (dependente.isPresent())
-            return dependente;
-        else
-            throw new DependenteException("Dependente não encontrado!");
-    }
-
-    
 
 }

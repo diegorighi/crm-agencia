@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "spring.data.mongodb.repositories.debug",
+    "type": "java.lang.String",
+    "description": "Habilita modo debug para los repositorios de MongoDB"
+  },
+  {
+    "name": "mongodb.defined.uri",
+    "type": "java.lang.String",
+    "description": "Define a URI de conexão do MongoDB"
+  }
+]}

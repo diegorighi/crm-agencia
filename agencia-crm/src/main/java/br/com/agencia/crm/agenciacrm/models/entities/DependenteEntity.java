@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import br.com.agencia.crm.agenciacrm.models.records.dto.DependenteRecordDTO;
-import br.com.agencia.crm.agenciacrm.models.records.dto.TitularRecordDTO;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

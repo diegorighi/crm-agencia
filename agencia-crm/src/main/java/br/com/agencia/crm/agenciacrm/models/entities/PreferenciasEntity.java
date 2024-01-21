@@ -2,9 +2,6 @@ package br.com.agencia.crm.agenciacrm.models.entities;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaAssentoEnum;
-import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaClasseEnum;
-import br.com.agencia.crm.agenciacrm.models.enums.PreferenciaRefeicaoEnum;
 import br.com.agencia.crm.agenciacrm.models.records.dto.PreferenciasRecordDTO;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

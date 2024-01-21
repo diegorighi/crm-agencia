@@ -11,23 +11,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.agencia.crm.agenciacrm.models.entities.Cliente;
-import br.com.agencia.crm.agenciacrm.models.entities.DependenteEntity;
 import br.com.agencia.crm.agenciacrm.models.entities.TitularEntity;
 import br.com.agencia.crm.agenciacrm.models.records.dto.ClienteDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.DependenteRecordDTO;
 import br.com.agencia.crm.agenciacrm.models.records.dto.TitularRecordDTO;
-import br.com.agencia.crm.agenciacrm.models.records.forms.TitularEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.DependenteEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.DependenteRecordForm;
+import br.com.agencia.crm.agenciacrm.models.records.forms.TitularEditRecordForm;
 import br.com.agencia.crm.agenciacrm.models.records.forms.TitularRecordForm;
 import br.com.agencia.crm.agenciacrm.models.wrapper.ResponseWrapper;
 import br.com.agencia.crm.agenciacrm.services.ClienteService;
@@ -73,10 +72,10 @@ public class ClienteController {
     @GetMapping("/{cpf}")
     public ResponseEntity<ClienteDTO> buscarCliente(@PathVariable String cpf) {
         ClienteDTO cliente = service.buscarPorCPF(cpf);
-        return ResponseEntity.ok(cliente);
+        return ResponseEntity.status(200).body(cliente);
     }
 
-    @PutMapping("/dependente/incluir")
+    @PostMapping("/dependente/incluir")
     public ResponseEntity<ResponseWrapper<DependenteRecordDTO>> incluirDependente(@RequestBody @Valid DependenteRecordForm form) {
         DependenteRecordDTO dependente = service.incluirDependente(form);
         System.out.println(dependente);
@@ -87,7 +86,7 @@ public class ClienteController {
                         true));
     }
 
-    @PutMapping("/editar/titular/{cpf}")
+    @PatchMapping("/editar/titular/{cpf}")
     public ResponseEntity<ResponseWrapper<HashMap<String, Object>>> editarTitular(
             @PathVariable String cpf,
             @RequestBody TitularEditRecordForm formEdit) {
@@ -105,15 +104,14 @@ public class ClienteController {
     public ResponseEntity<ResponseWrapper<String>> excluirCliente(@PathVariable String cpf) {
         Boolean clienteRemovido = service.removerCliente(cpf);
 
-        return ResponseEntity.ok(
-                new ResponseWrapper<String>(
+        return ResponseEntity.status(204).body(new ResponseWrapper<String>(
                         cpf,
                         "O Cpf informado foi removido com sucesso!",
                         clienteRemovido));
     }
 
     // Editar dependente
-    @PutMapping("/dependente/editar/{cpfDependente}")
+    @PatchMapping("/dependente/editar/{cpfDependente}")
     public ResponseEntity<ResponseWrapper<HashMap<String, Object>>> editarDependente(
             @PathVariable String cpfDependente,
             @RequestBody final DependenteEditRecordForm formEdit) {
